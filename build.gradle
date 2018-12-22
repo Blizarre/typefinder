@@ -1,0 +1,28 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm" version "1.3.11"
+}
+
+repositories {
+    jcenter()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation group: 'io.netty', name: 'netty-all', version: '4.1.5.Final'
+    implementation 'com.beust:klaxon:3.0.1'
+    compile "org.jetbrains.kotlinx:kotlinx-html-jvm:0.6.12"
+}
+
+task run(type: JavaExec) {
+    main = 'com.wiam.MainKt'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+
+jar {
+    manifest {
+        attributes("Implementation-Title": "WIAM",
+                "Implementation-Version": "0.1")
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
