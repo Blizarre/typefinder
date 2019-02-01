@@ -7,7 +7,7 @@ import java.util.logging.Logger
 const val REPOSITORY_QUEUE_SIZE = 50
 const val RELEASE_QUEUE_SIZE = 50
 
-val log = Logger.getLogger("Main")!!
+val log = Logger.getGlobal()!!
 
 fun main(args: Array<String>) {
     if (args.size != 1) {
@@ -16,7 +16,6 @@ fun main(args: Array<String>) {
     }
 
     log.level = Level.FINE
-    log.parent.level = Level.FINE
     log.parent.handlers.forEach { it.level = Level.FINE }
 
     val repositoryQueue = Queue<Repository>(REPOSITORY_QUEUE_SIZE)
