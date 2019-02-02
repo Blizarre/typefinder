@@ -18,7 +18,7 @@ class Statistics {
     override fun toString(): String {
         lock.withLock {
             val str = StringBuilder()
-            map.forEach { k, v -> str.append("$k:\t$v\n") }
+            map.keys.sorted().forEach { k -> str.append("$k:\t${map[k]}\n") }
             return str.toString()
         }
     }

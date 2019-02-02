@@ -29,16 +29,23 @@ class GithubReposParser(
                 val release = Klaxon().parse<com.wiam.github.json.Release>(stream)
                 if (release != null) {
                     log.info("Found release ${release.zipball_url}")
-                    stats.add("parser.releases.found", 1)
+                    stats.add("parser.releases.parsed", 1)
                     releaseQueue.accept(Release(repo, release))
                 } else {
+                    stats.add("parser.parse.error", 1)
                     log.warning("Error when fetching release for ${repo.full_name}")
                 }
             } catch (e: RequestError) {
                 stats.add("parser.request.errors", 1)
                 when (e.code) {
-                    404 -> log.info("No release for ${repo.full_name}")
-                    else -> log.warning("Error when fetching ${repo.full_name}: ${e.message}")
+                    404 -> {
+                        log.info("No release for ${repo.full_name}")
+                        stats.add("parser.request.norrelease", 1)
+                    }
+                    else -> {
+                        stats.add("parser.request.error", 1)
+                        log.warning("Error when fetching ${repo.full_name}: ${e.message}")
+                    }
 
                 }
             } catch (e: KlaxonException) {

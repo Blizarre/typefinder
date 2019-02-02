@@ -67,7 +67,7 @@ fun main(args: Array<String>) {
         if (!tp.isAlive) log.warning("Parsing thread dead")
         if (!tc.isAlive) log.warning("Finder thread dead")
         Thread.sleep(5000)
-        log.info("Runtime Statistics:\n$stats")
+        System.out.println("Runtime Statistics:\n$stats")
     }
 }
 
