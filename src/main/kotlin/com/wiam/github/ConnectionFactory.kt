@@ -1,4 +1,4 @@
-package com.wiam
+package com.wiam.github
 
 import java.net.HttpURLConnection
 import java.net.URL

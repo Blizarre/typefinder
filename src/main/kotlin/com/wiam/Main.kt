@@ -1,6 +1,8 @@
 package com.wiam
 
-import org.jetbrains.exposed.dao.IntIdTable
+import com.wiam.github.GithubAPIInterface
+import com.wiam.github.json.Repository
+import com.wiam.persistence.Types
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -12,12 +14,6 @@ const val REPOSITORY_QUEUE_SIZE = 50
 const val RELEASE_QUEUE_SIZE = 50
 
 val log = Logger.getGlobal()!!
-
-object Types : IntIdTable() {
-    val githubFileUrl = text("githubfileurl")
-    val line = integer("line")
-    val type = varchar("type", 128)
-}
 
 fun main(args: Array<String>) {
     log.level = Level.INFO

@@ -5,6 +5,7 @@ import com.github.javaparser.ParseProblemException
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.type.ClassOrInterfaceType
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter
+import com.wiam.persistence.Types
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.FilterInputStream

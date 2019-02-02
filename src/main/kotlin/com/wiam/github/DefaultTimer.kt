@@ -1,5 +1,6 @@
-package com.wiam
+package com.wiam.github
 
+import com.wiam.log
 import java.time.Duration
 import java.time.Instant
 

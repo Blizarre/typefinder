@@ -1,6 +1,9 @@
 package com.wiam
 
 import com.beust.klaxon.Klaxon
+import com.wiam.github.GithubAPIInterface
+import com.wiam.github.json.Repository
+import com.wiam.github.json.SearchResult
 import java.net.URL
 import java.security.InvalidParameterException
 import java.util.function.Consumer
@@ -45,15 +48,3 @@ class GithubReposDiscoverer(private val processQueue: Consumer<Repository>, priv
     }
 }
 
-class SearchResult(
-    val total_count: Int,
-    val items: List<Repository>
-)
-
-data class Repository(
-        val id: Long,
-        val full_name: String,
-        val releases_url: String,
-        val name: String,
-        val html_url: String
-)

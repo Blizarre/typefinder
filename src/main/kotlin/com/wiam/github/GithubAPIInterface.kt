@@ -1,5 +1,6 @@
-package com.wiam
+package com.wiam.github
 
+import com.wiam.log
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLConnection
@@ -14,8 +15,8 @@ const val RATELIMIT_RESET_TIME = "X-RateLimit-Reset"
 class RequestError(val code: Int) : Exception("Request failed with code $code")
 
 class GithubAPIInterface(
-    private val cnx: ConnectionFactory = ConnectionFactory(),
-    private val timer: DefaultTimer = DefaultTimer()
+        private val cnx: ConnectionFactory = ConnectionFactory(),
+        private val timer: DefaultTimer = DefaultTimer()
 ) {
     private val lock = ReentrantLock()
 
