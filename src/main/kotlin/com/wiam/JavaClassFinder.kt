@@ -6,7 +6,6 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.type.ClassOrInterfaceType
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter
 import com.wiam.persistence.Types
-import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.FilterInputStream
 import java.io.IOException
@@ -21,6 +20,7 @@ data class Type(val type_name: String)
 class ReleaseFile(val path: String, stream: InputStream) {
     private val types = HashMap<Type, MutableSet<Int>>()
 
+    // TODO: add 2 kind of errors (system-wide?)
     // IrrecoverableError | TransientError
 
     val javaTypes: Map<Type, Set<Int>>
@@ -90,17 +90,12 @@ class JavaClassProcessor(private val processQueue: Producer<Release>, val databa
                 transaction {
                     files.forEach { file ->
                         file.javaTypes.forEach {
-                            it.value.forEach { lineInFile ->
-                                database.insert { row ->
-                                    row[githubFileUrl] = release.htmlUrl(file.path)
-                                    row[line] = lineInFile
-                                    row[type] = it.key.type_name
-                                }
-                                Unit
+                            val (type, lines) = it
+                            lines.forEach { lineInFile ->
+                                database.insert(type.type_name, release.htmlUrl(file.path), lineInFile)
                             }
                         }
                     }
-
                 }
                 log.info("Processed ${release.zipUrl} and found ${files.size} files ($nbTypes types)")
             } catch (ioException: IOException) {
