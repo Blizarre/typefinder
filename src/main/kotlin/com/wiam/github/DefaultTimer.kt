@@ -23,4 +23,6 @@ class DefaultTimer {
     fun futureTime(secondInFuture: Long): Instant {
         return Instant.now().plus(Duration.ofSeconds(secondInFuture))
     }
+
+    fun now(): Instant = Instant.now()!!
 }

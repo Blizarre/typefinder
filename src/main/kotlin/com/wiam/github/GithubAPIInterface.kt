@@ -20,11 +20,11 @@ class GithubAPIInterface(
 ) {
     private val lock = ReentrantLock()
 
-    var nextCall = Instant.now()
+    var nextCall = timer.now()
 
     fun call(url: URL): URLConnection {
         lock.withLock {
-            log.fine("Waiting ${nextCall.epochSecond - Instant.now().epochSecond} before the next call")
+            log.fine("Waiting ${nextCall.epochSecond - timer.now().epochSecond} before the next call")
             timer.waitUntil(nextCall)
             return innerCall(url)
         }
