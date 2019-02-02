@@ -97,7 +97,7 @@ class JavaClassProcessor(private val processQueue: Producer<Release>, private va
                             val (type, lines) = it
                             lines.forEach { lineInFile ->
                                 stats.add("java.types.total", 1)
-                                database.insert(type.type_name, release.htmlUrl(file.path), lineInFile)
+                                database.insert(release.repository.full_name, type.type_name, release.htmlUrl(file.path), lineInFile)
                             }
                         }
                     }
