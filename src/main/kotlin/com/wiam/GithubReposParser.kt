@@ -37,11 +37,16 @@ class GithubReposParser(
 }
 
 data class ReleaseDeserialized(
-    val zipball_url: String,
-    val name: String
+        val zipball_url: String,
+        val name: String,
+        val tag_name: String
 )
 
 class Release(val repository: Repository, releaseDeserialized: ReleaseDeserialized) {
-    val url = URL(releaseDeserialized.zipball_url)
+    val zipUrl = URL(releaseDeserialized.zipball_url)
     val name = releaseDeserialized.name
+    val tagName = releaseDeserialized.tag_name
+
+    fun htmlUrl(filePath: String) = "${repository.html_url}/tree/$tagName/$filePath"
+
 }

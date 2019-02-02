@@ -5,6 +5,8 @@ import com.github.javaparser.ParseProblemException
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.type.ClassOrInterfaceType
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.FilterInputStream
 import java.io.IOException
 import java.io.InputStream
@@ -15,7 +17,7 @@ import kotlin.collections.HashSet
 
 data class Type(val type_name: String)
 
-class File(val identifier: String, stream: InputStream) {
+class ReleaseFile(val path: String, stream: InputStream) {
     private val types = HashMap<Type, MutableSet<Int>>()
 
     // IrrecoverableError | TransientError
@@ -27,14 +29,14 @@ class File(val identifier: String, stream: InputStream) {
 
     init {
         val cu = JavaParser.parse(stream)
-        cu.accept(object : VoidVisitorAdapter<File>() {
+        cu.accept(object : VoidVisitorAdapter<ReleaseFile>() {
 
-            override fun visit(n: ClassOrInterfaceDeclaration, arg: File) {
+            override fun visit(n: ClassOrInterfaceDeclaration, arg: ReleaseFile) {
                 super.visit(n, arg)
                 arg.add(Type(n.nameAsString), n.begin.get().line)
             }
 
-            override fun visit(n: ClassOrInterfaceType, arg: File) {
+            override fun visit(n: ClassOrInterfaceType, arg: ReleaseFile) {
                 super.visit(n, arg)
                 arg.add(Type(n.nameAsString), n.begin.get().line)
             }
@@ -44,10 +46,10 @@ class File(val identifier: String, stream: InputStream) {
 
 }
 
-class Archive(val identifier: String, stream: InputStream) {
-    private val files = ArrayList<File>()
+class ReleaseArchive(private val identifier: String, stream: InputStream) {
+    private val files = ArrayList<ReleaseFile>()
 
-    val javaFiles: List<File>
+    val javaFiles: List<ReleaseFile>
         get() = files
 
     init {
@@ -63,7 +65,8 @@ class Archive(val identifier: String, stream: InputStream) {
                 if (entry.name.endsWith(".java")) {
                     log.fine("Found java file: ${entry.name}")
                     try {
-                        files.add(File(entry.name, noCloseIs))
+                        val name = entry.name.removeRange(0..entry.name.indexOfFirst { it == '/' })
+                        files.add(ReleaseFile(name, noCloseIs))
                     } catch (e: ParseProblemException) {
                         val message = e.problems.take(3).joinToString(", ") { it.verboseMessage }
                         log.warning("Could not parse file ${entry.name} in $identifier: $message")
@@ -75,17 +78,32 @@ class Archive(val identifier: String, stream: InputStream) {
     }
 }
 
-class JavaClassProcessor(private val processQueue: Producer<Release>) : Runnable {
+class JavaClassProcessor(private val processQueue: Producer<Release>, val database: Types) : Runnable {
     override fun run() {
         do {
             val release = processQueue.get()
             try {
-                val zipis = Archive(release.name, release.url.openStream())
+                val zipis = ReleaseArchive(release.name, release.zipUrl.openStream())
                 val files = zipis.javaFiles
                 val nbTypes = files.map { it.javaTypes.size }.sum()
-                log.info("Processed ${release.url} and found ${files.size} files ($nbTypes types)")
+                transaction {
+                    files.forEach { file ->
+                        file.javaTypes.forEach {
+                            it.value.forEach { lineInFile ->
+                                database.insert { row ->
+                                    row[githubFileUrl] = release.htmlUrl(file.path)
+                                    row[line] = lineInFile
+                                    row[type] = it.key.type_name
+                                }
+                                Unit
+                            }
+                        }
+                    }
+
+                }
+                log.info("Processed ${release.zipUrl} and found ${files.size} files ($nbTypes types)")
             } catch (ioException: IOException) {
-                log.severe("Error processing ${release.url}: ${ioException.message}")
+                log.severe("Error processing ${release.zipUrl}: ${ioException.message}")
             }
         } while (true)
     }

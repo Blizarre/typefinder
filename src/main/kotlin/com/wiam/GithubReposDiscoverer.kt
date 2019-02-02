@@ -50,8 +50,10 @@ class SearchResult(
     val items: List<Repository>
 )
 
-class Repository(
-    val id: Long,
-    val full_name: String,
-    val releases_url: String
+data class Repository(
+        val id: Long,
+        val full_name: String,
+        val releases_url: String,
+        val name: String,
+        val html_url: String
 )

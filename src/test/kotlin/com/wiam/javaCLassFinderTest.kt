@@ -7,7 +7,7 @@ class JavaClassFinderTest {
     @Test
     fun testProcessFile() {
         val fileResourceStream = this.javaClass.classLoader.getResourceAsStream("helloworld.java")!!
-        val results = File("test", fileResourceStream)
+        val results = ReleaseFile("test", fileResourceStream)
         Assertions.assertEquals(
             mapOf(
                 Type("HelloWorld") to setOf(5),
@@ -24,9 +24,9 @@ class JavaClassFinderTest {
     @Test
     fun testProcessArchive() {
         val archiveResourceStream = this.javaClass.classLoader.getResourceAsStream("testArchive.zip")!!
-        val results = Archive("none", archiveResourceStream)
+        val results = ReleaseArchive("none", archiveResourceStream)
         val expected = mapOf(
-            "File 1.java" to mapOf(
+                "ReleaseFile 1.java" to mapOf(
                 Type("HelloWorld") to setOf(5),
                 Type("Bonobo") to setOf(7),
                 Type("String") to setOf(9)
@@ -42,10 +42,10 @@ class JavaClassFinderTest {
 
         results.javaFiles.forEach {
             Assertions.assertTrue(
-                expected.containsKey(it.identifier),
-                "No file ${it.identifier} in ${expected.keys.joinToString(", ")}"
+                    expected.containsKey(it.path),
+                    "No file ${it.path} in ${expected.keys.joinToString(", ")}"
             )
-            Assertions.assertEquals(expected[it.identifier], it.javaTypes)
+            Assertions.assertEquals(expected[it.path], it.javaTypes)
         }
     }
 }
