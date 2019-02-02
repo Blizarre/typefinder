@@ -22,6 +22,7 @@ dependencies {
 }
 
 task run(type: JavaExec) {
+    systemProperty "github.token", System.getProperty("github.token")
     main = 'com.wiam.MainKt'
     classpath = sourceSets.main.runtimeClasspath
 }

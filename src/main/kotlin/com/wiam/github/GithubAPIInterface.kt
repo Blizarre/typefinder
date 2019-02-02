@@ -15,7 +15,7 @@ const val RATELIMIT_RESET_TIME = "X-RateLimit-Reset"
 class RequestError(val code: Int) : Exception("Request failed with code $code")
 
 class GithubAPIInterface(
-        private val cnx: ConnectionFactory = ConnectionFactory(),
+        private val cnx: ConnectionFactory = ConnectionFactory(System.getProperty("github.token")),
         private val timer: DefaultTimer = DefaultTimer()
 ) {
     private val lock = ReentrantLock()
