@@ -3,7 +3,6 @@ package com.wiam
 import com.beust.klaxon.Klaxon
 import com.wiam.github.GithubAPIInterface
 import com.wiam.github.json.Repository
-import com.wiam.github.json.SearchResult
 import com.wiam.stats.Statistics
 import java.net.URL
 import java.security.InvalidParameterException
@@ -12,7 +11,7 @@ import java.util.logging.Logger
 
 class GithubReposDiscoverer(private val processQueue: Consumer<Repository>, private val api: GithubAPIInterface, private val stats: Statistics) :
     Runnable {
-    private val javaReposSearch = URL("https://api.github.com/search/repositories?q=language=java")
+    private val javaReposSearch = URL("https://api.github.com/repositories")
     private val linkUrlRegex = Regex("<(.[^<>]+)>")
     private val linkRelRegex = Regex(""";\s+rel="(.*)"""")
     private val log = Logger.getLogger(this.javaClass.name)!!
@@ -25,7 +24,7 @@ class GithubReposDiscoverer(private val processQueue: Consumer<Repository>, priv
                 return URL(url)
         }
         log.warning("No next page found")
-        throw InvalidParameterException("Cound not find nex Github Page")
+        throw InvalidParameterException("Could not find next Github Page in header: $linkHeader")
     }
 
     override fun run() {
@@ -37,13 +36,13 @@ class GithubReposDiscoverer(private val processQueue: Consumer<Repository>, priv
             val cnx = api.call(currentPage)
             val nextPage = findNextPage(cnx.getHeaderField("Link") ?: "")
             val repos = Klaxon()
-                .parse<SearchResult>(cnx.getInputStream())
+                    .parseArray<Repository>(cnx.getInputStream())
                 ?: throw InvalidParameterException("Error parsing the response")
 
-            addedThisLoop = repos.items.size
+            addedThisLoop = repos.size
             log.info("Adding $addedThisLoop repos to the queue")
-            repos.items.forEach(processQueue::accept)
             stats.add("discover.repos.total", addedThisLoop)
+            repos.forEach(processQueue::accept)
             stats.add("discover.pages", 1)
             currentPage = nextPage
         } while (addedThisLoop > 0)

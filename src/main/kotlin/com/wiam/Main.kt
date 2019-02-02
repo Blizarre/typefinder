@@ -24,7 +24,6 @@ fun main(args: Array<String>) {
     val releaseQueue = Queue<Release>(RELEASE_QUEUE_SIZE)
 
     val githubInterfaceAPI = GithubAPIInterface()
-    val githubInterfaceSearch = GithubAPIInterface()
 
     Database.connect("jdbc:postgresql:githubparser", driver = "org.postgresql.Driver", user = "user", password = "user")
 
@@ -37,7 +36,7 @@ fun main(args: Array<String>) {
     }
 
     val stats = Statistics()
-    val reposDiscoverer = GithubReposDiscoverer(repositoryQueue, githubInterfaceSearch, stats)
+    val reposDiscoverer = GithubReposDiscoverer(repositoryQueue, githubInterfaceAPI, stats)
     val reposParser = GithubReposParser(repositoryQueue, releaseQueue, githubInterfaceAPI, stats)
     val classFinder = JavaClassProcessor(releaseQueue, Types, stats)
 
