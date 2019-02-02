@@ -4,12 +4,13 @@ import com.beust.klaxon.Klaxon
 import com.wiam.github.GithubAPIInterface
 import com.wiam.github.json.Repository
 import com.wiam.github.json.SearchResult
+import com.wiam.stats.Statistics
 import java.net.URL
 import java.security.InvalidParameterException
 import java.util.function.Consumer
 import java.util.logging.Logger
 
-class GithubReposDiscoverer(private val processQueue: Consumer<Repository>, private val api: GithubAPIInterface) :
+class GithubReposDiscoverer(private val processQueue: Consumer<Repository>, private val api: GithubAPIInterface, private val stats: Statistics) :
     Runnable {
     private val javaReposSearch = URL("https://api.github.com/search/repositories?q=language=java")
     private val linkUrlRegex = Regex("<(.[^<>]+)>")
@@ -42,6 +43,8 @@ class GithubReposDiscoverer(private val processQueue: Consumer<Repository>, priv
             addedThisLoop = repos.items.size
             log.info("Adding $addedThisLoop repos to the queue")
             repos.items.forEach(processQueue::accept)
+            stats.add("discover.repos.total", addedThisLoop)
+            stats.add("discover.pages", 1)
             currentPage = nextPage
         } while (addedThisLoop > 0)
         log.info("Finished indexing")

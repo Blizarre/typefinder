@@ -3,6 +3,7 @@ package com.wiam
 import com.wiam.github.GithubAPIInterface
 import com.wiam.github.json.Repository
 import com.wiam.persistence.Types
+import com.wiam.stats.Statistics
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -35,10 +36,10 @@ fun main(args: Array<String>) {
         }
     }
 
-
-    val reposDiscoverer = GithubReposDiscoverer(repositoryQueue, githubInterfaceSearch)
-    val reposParser = GithubReposParser(repositoryQueue, releaseQueue, githubInterfaceAPI)
-    val classFinder = JavaClassProcessor(releaseQueue, Types)
+    val stats = Statistics()
+    val reposDiscoverer = GithubReposDiscoverer(repositoryQueue, githubInterfaceSearch, stats)
+    val reposParser = GithubReposParser(repositoryQueue, releaseQueue, githubInterfaceAPI, stats)
+    val classFinder = JavaClassProcessor(releaseQueue, Types, stats)
 
     val ti = Thread(reposDiscoverer)
     val tp = Thread(reposParser)
@@ -60,10 +61,13 @@ fun main(args: Array<String>) {
 
     log.info("Starting status thread ${status.id}")
     status.start()
-    ti.join()
-    tp.join()
-    tc.join()
-    status.join()
-    log.info("End of threads")
+
+    while (true) {
+        if (!ti.isAlive) log.warning("Indexing thread dead")
+        if (!tp.isAlive) log.warning("Parsing thread dead")
+        if (!tc.isAlive) log.warning("Finder thread dead")
+        Thread.sleep(5000)
+        log.info("Runtime Statistics:\n$stats")
+    }
 }
 

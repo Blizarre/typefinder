@@ -6,6 +6,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.type.ClassOrInterfaceType
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter
 import com.wiam.persistence.Types
+import com.wiam.stats.Statistics
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.FilterInputStream
 import java.io.IOException
@@ -79,19 +80,23 @@ class ReleaseArchive(private val identifier: String, stream: InputStream) {
     }
 }
 
-class JavaClassProcessor(private val processQueue: Producer<Release>, val database: Types) : Runnable {
+class JavaClassProcessor(private val processQueue: Producer<Release>, private val database: Types, private val stats: Statistics) : Runnable {
     override fun run() {
         do {
             val release = processQueue.get()
             try {
+                stats.add("java.archive.total", 1)
                 val zipis = ReleaseArchive(release.name, release.zipUrl.openStream())
                 val files = zipis.javaFiles
+                stats.add("java.files.total", files.size)
+
                 val nbTypes = files.map { it.javaTypes.size }.sum()
                 transaction {
                     files.forEach { file ->
                         file.javaTypes.forEach {
                             val (type, lines) = it
                             lines.forEach { lineInFile ->
+                                stats.add("java.types.total", 1)
                                 database.insert(type.type_name, release.htmlUrl(file.path), lineInFile)
                             }
                         }
@@ -99,6 +104,7 @@ class JavaClassProcessor(private val processQueue: Producer<Release>, val databa
                 }
                 log.info("Processed ${release.zipUrl} and found ${files.size} files ($nbTypes types)")
             } catch (ioException: IOException) {
+                stats.add("java.process.error", 1)
                 log.severe("Error processing ${release.zipUrl}: ${ioException.message}")
             }
         } while (true)
