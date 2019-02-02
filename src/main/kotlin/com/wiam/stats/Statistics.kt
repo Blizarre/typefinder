@@ -15,14 +15,6 @@ class Statistics {
         }
     }
 
-    fun sub(key: String, amount: Int) {
-        lock.withLock {
-            map.let {
-                it[key] = it.getOrDefault(key, 0) - amount
-            }
-        }
-    }
-
     override fun toString(): String {
         lock.withLock {
             val str = StringBuilder()

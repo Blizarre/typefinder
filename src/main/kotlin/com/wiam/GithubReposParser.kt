@@ -49,10 +49,10 @@ class GithubReposParser(
     }
 }
 
-class Release(val repository: Repository, jsonRelease: com.wiam.github.json.Release) {
+class Release(private val repository: Repository, jsonRelease: com.wiam.github.json.Release) {
+    private val tagName = jsonRelease.tag_name
     val zipUrl = URL(jsonRelease.zipball_url)
     val name = jsonRelease.name
-    val tagName = jsonRelease.tag_name
 
     fun htmlUrl(filePath: String) = "${repository.html_url}/tree/$tagName/$filePath"
 }

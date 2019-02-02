@@ -20,7 +20,7 @@ class GithubAPIInterface(
 ) {
     private val lock = ReentrantLock()
 
-    var nextCall = timer.now()
+    private var nextCall = timer.now()
 
     fun call(url: URL): URLConnection {
         lock.withLock {
