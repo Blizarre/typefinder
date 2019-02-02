@@ -38,7 +38,7 @@ class GithubAPIInterface(
         when (connection.responseCode) {
             200 -> {
                 nextCall = timer.futureTime(
-                    (Instant.now().epochSecond - resetTime.epochSecond).toDouble()
+                    (resetTime.epochSecond - Instant.now().epochSecond).toDouble()
                         .div(remaining.toDouble()).roundToLong() + 1
                 )
                 return connection

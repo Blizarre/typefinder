@@ -9,7 +9,7 @@ class DefaultTimer {
     }
 
     fun waitUntil(i: Instant) {
-        val waitingTime = Duration.between(i, currentTime())
+        val waitingTime = Duration.between(currentTime(), i)
         if (waitingTime.isNegative) {
             log.info("Not waiting")
             return
