@@ -5,10 +5,10 @@ import org.jetbrains.exposed.sql.insert
 import org.joda.time.DateTime
 
 object ClassFinderError : IntIdTable() {
-    private val repository = ClassFinderError.text("repository")
-    private val githubFileUrl = ClassFinderError.text("githubfileurl")
-    private val message = ClassFinderError.text("message")
-    private val time = ClassFinderError.datetime("timestamp")
+    private val repository = text("repository")
+    private val githubFileUrl = text("githubfileurl")
+    private val message = text("message")
+    private val time = datetime("timestamp")
 
     fun insert(repository: String, fileUrl: String, message: String) {
         insert {

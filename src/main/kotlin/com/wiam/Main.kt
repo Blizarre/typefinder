@@ -2,6 +2,7 @@ package com.wiam
 
 import com.wiam.github.listreleases.JavaReposReleases
 import com.wiam.github.listreleases.Release
+import com.wiam.persistence.APICursor
 import com.wiam.persistence.ClassFinderError
 import com.wiam.persistence.Types
 import com.wiam.stats.Statistics
@@ -22,7 +23,7 @@ fun main(args: Array<String>) {
 
     val releaseQueue = Queue<Release>(RELEASE_QUEUE_SIZE)
 
-    val githubInterfaceAPI = JavaReposReleases()
+    val githubInterfaceAPI = JavaReposReleases(APICursor)
 
     // TODO: Improve data model with a separate Repository table
     // TODO: Add persistence for the discoverer
@@ -36,6 +37,9 @@ fun main(args: Array<String>) {
 
             SchemaUtils.drop(ClassFinderError)
             SchemaUtils.create(ClassFinderError)
+
+            SchemaUtils.drop(APICursor)
+            SchemaUtils.create(APICursor)
         }
     }
 

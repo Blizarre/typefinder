@@ -2,6 +2,8 @@ package com.wiam.github.listreleases
 
 import com.beust.klaxon.Klaxon
 import com.wiam.github.GraphQLAPIConnection
+import com.wiam.persistence.APICursor
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.net.URL
 import java.security.InvalidParameterException
 import java.util.zip.GZIPInputStream
@@ -10,16 +12,21 @@ class RequestError(code: Int) : Exception("Request failed with code $code")
 class InvalidResponse(invalidData: String) : Exception("Cannot parse data:\n$invalidData")
 
 class JavaReposReleases(
+        private val cursorManager: APICursor,
         private val cnx: GraphQLAPIConnection = GraphQLAPIConnection(System.getProperty("github.token")
                 ?: throw InvalidParameterException("Token not found"))
 ) {
     private val queryJavaRepos = ClassLoader.getSystemResourceAsStream("githubQuery.graphql").readAllBytes().toString(Charsets.UTF_8)
 
-    var nextCursor: String? = null
-
     fun listReleases(): List<Release> {
-        val rawResult = fetch(nextCursor)
-        nextCursor = rawResult.pageInfo.endCursor
+        val cursor = transaction {
+            cursorManager.getLast()
+        }
+        val rawResult = fetch(cursor)
+
+        transaction {
+            cursorManager.insert(rawResult.pageInfo.endCursor)
+        }
 
         return rawResult.edges.map {
             Release(
