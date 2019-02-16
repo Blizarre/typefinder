@@ -1,0 +1,173 @@
+{
+  "data": {
+    "search": {
+      "pageInfo": {
+        "endCursor": "Y3Vyc29yOjEw",
+        "startCursor": "Y3Vyc29yOjE="
+      },
+      "repositoryCount": 5864333,
+      "edges": [
+        {
+          "node": {
+            "id": "MDEwOlJlcG9zaXRvcnk1MDc3NzU=",
+            "name": "elasticsearch",
+            "url": "https://github.com/elastic/elasticsearch",
+            "releases": {
+              "nodes": []
+            },
+            "defaultBranchRef": {
+              "name": "master"
+            }
+          }
+        },
+        {
+          "node": {
+            "id": "MDEwOlJlcG9zaXRvcnk3NTA4NDEx",
+            "name": "RxJava",
+            "url": "https://github.com/ReactiveX/RxJava",
+            "releases": {
+              "nodes": [
+                {
+                  "url": "https://github.com/ReactiveX/RxJava/releases/tag/v2.2.6",
+                  "tagName": "v2.2.6"
+                }
+              ]
+            },
+            "defaultBranchRef": {
+              "name": "2.x"
+            }
+          }
+        },
+        {
+          "node": {
+            "id": "MDEwOlJlcG9zaXRvcnk2Mjk2Nzkw",
+            "name": "spring-boot",
+            "url": "https://github.com/spring-projects/spring-boot",
+            "releases": {
+              "nodes": [
+                {
+                  "url": "https://github.com/spring-projects/spring-boot/releases/tag/v2.1.3.RELEASE",
+                  "tagName": "v2.1.3.RELEASE"
+                }
+              ]
+            },
+            "defaultBranchRef": {
+              "name": "master"
+            }
+          }
+        },
+        {
+          "node": {
+            "id": "MDEwOlJlcG9zaXRvcnk4MTk3NTM3Mg==",
+            "name": "interviews",
+            "url": "https://github.com/kdn251/interviews",
+            "releases": {
+              "nodes": []
+            },
+            "defaultBranchRef": {
+              "name": "master"
+            }
+          }
+        },
+        {
+          "node": {
+            "id": "MDEwOlJlcG9zaXRvcnk1MTUyMjg1",
+            "name": "okhttp",
+            "url": "https://github.com/square/okhttp",
+            "releases": {
+              "nodes": []
+            },
+            "defaultBranchRef": {
+              "name": "master"
+            }
+          }
+        },
+        {
+          "node": {
+            "id": "MDEwOlJlcG9zaXRvcnkyMDMwMDE3Nw==",
+            "name": "guava",
+            "url": "https://github.com/google/guava",
+            "releases": {
+              "nodes": [
+                {
+                  "url": "https://github.com/google/guava/releases/tag/v27.0.1",
+                  "tagName": "v27.0.1"
+                }
+              ]
+            },
+            "defaultBranchRef": {
+              "name": "master"
+            }
+          }
+        },
+        {
+          "node": {
+            "id": "MDEwOlJlcG9zaXRvcnkxOTE0ODk0OQ==",
+            "name": "MPAndroidChart",
+            "url": "https://github.com/PhilJay/MPAndroidChart",
+            "releases": {
+              "nodes": [
+                {
+                  "url": "https://github.com/PhilJay/MPAndroidChart/releases/tag/v3.1.0-alpha",
+                  "tagName": "v3.1.0-alpha"
+                }
+              ]
+            },
+            "defaultBranchRef": {
+              "name": "master"
+            }
+          }
+        },
+        {
+          "node": {
+            "id": "MDEwOlJlcG9zaXRvcnkxMTI2NzUwOQ==",
+            "name": "glide",
+            "url": "https://github.com/bumptech/glide",
+            "releases": {
+              "nodes": [
+                {
+                  "url": "https://github.com/bumptech/glide/releases/tag/v4.9.0",
+                  "tagName": "v4.9.0"
+                }
+              ]
+            },
+            "defaultBranchRef": {
+              "name": "master"
+            }
+          }
+        },
+        {
+          "node": {
+            "id": "MDEwOlJlcG9zaXRvcnk3MDE5ODg3NQ==",
+            "name": "lottie-android",
+            "url": "https://github.com/airbnb/lottie-android",
+            "releases": {
+              "nodes": [
+                {
+                  "url": "https://github.com/airbnb/lottie-android/releases/tag/v2.7.0",
+                  "tagName": "v2.7.0"
+                }
+              ]
+            },
+            "defaultBranchRef": {
+              "name": "master"
+            }
+          }
+        },
+        {
+          "node": {
+            "id": "MDEwOlJlcG9zaXRvcnkxMzI0NjQzOTU=",
+            "name": "JavaGuide",
+            "url": "https://github.com/Snailclimb/JavaGuide",
+            "releases": {
+              "nodes": []
+            },
+            "defaultBranchRef": {
+              "name": "master"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
