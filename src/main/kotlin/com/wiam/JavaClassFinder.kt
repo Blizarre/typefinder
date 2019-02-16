@@ -5,6 +5,7 @@ import com.github.javaparser.ParseProblemException
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.type.ClassOrInterfaceType
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter
+import com.wiam.github.listreleases.Release
 import com.wiam.persistence.Types
 import com.wiam.stats.Statistics
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -86,7 +87,7 @@ class JavaClassProcessor(private val processQueue: Producer<Release>, private va
             val release = processQueue.get()
             try {
                 stats.add("java.archive.total", 1)
-                val zipis = ReleaseArchive(release.name, release.zipUrl.openStream())
+                val zipis = ReleaseArchive(release.repository.name, release.url.openStream())
                 val files = zipis.javaFiles
                 stats.add("java.files.total", files.size)
 
@@ -97,16 +98,18 @@ class JavaClassProcessor(private val processQueue: Producer<Release>, private va
                             val (type, lines) = it
                             lines.forEach { lineInFile ->
                                 stats.add("java.types.total", 1)
-                                database.insert(release.repository.full_name, type.type_name, release.htmlUrl(file.path), lineInFile)
+                                database.insert(release.repository.url, type.type_name, release.htmlUrl(file.path), lineInFile)
                             }
                         }
                     }
                 }
-                log.info("Processed ${release.zipUrl} and found ${files.size} files ($nbTypes types)")
+                log.info("Processed ${release.url} and found ${files.size} files ($nbTypes types)")
             } catch (ioException: IOException) {
                 stats.add("java.process.error", 1)
-                log.severe("Error processing ${release.zipUrl}: ${ioException.message}")
+                log.severe("Error processing ${release.url}: ${ioException.message}")
             }
         } while (true)
     }
 }
+
+fun Release.htmlUrl(path: String) = "${repository.url}/tree/$commitIdentifier/$path"

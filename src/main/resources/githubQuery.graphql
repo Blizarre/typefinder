@@ -1,0 +1,27 @@
+query findJavaRepos($first: Int, $after: String) {
+  search(first: $first, after: $after, type: REPOSITORY, query: "language:java is:public archived:false") {
+    pageInfo {
+      endCursor
+      startCursor
+    },
+    repositoryCount,
+    edges {
+      node {
+        ... on Repository {
+          id,
+          name,
+          url,
+          releases(last: 1) {
+            nodes {
+              url,
+              tagName
+            }
+          }
+          defaultBranchRef {
+            name
+          }
+        }
+      }
+    }
+  }
+}
