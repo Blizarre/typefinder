@@ -23,6 +23,8 @@ fun main(args: Array<String>) {
 
     val githubInterfaceAPI = JavaReposReleases()
 
+    // TODO: Improve data model with a separate Repository table
+    // TODO: Add persistence for the discoverer
     Database.connect("jdbc:postgresql:githubparser", driver = "org.postgresql.Driver", user = "user", password = "user")
 
     if (args.contains("--reset")) {
