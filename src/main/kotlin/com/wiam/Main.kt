@@ -2,6 +2,7 @@ package com.wiam
 
 import com.wiam.github.listreleases.JavaReposReleases
 import com.wiam.github.listreleases.Release
+import com.wiam.persistence.ClassFinderError
 import com.wiam.persistence.Types
 import com.wiam.stats.Statistics
 import org.jetbrains.exposed.sql.Database
@@ -32,16 +33,19 @@ fun main(args: Array<String>) {
         transaction {
             SchemaUtils.drop(Types)
             SchemaUtils.create(Types)
+
+            SchemaUtils.drop(ClassFinderError)
+            SchemaUtils.create(ClassFinderError)
         }
     }
 
     val stats = Statistics()
     val reposDiscoverer = GithubReposDiscoverer(releaseQueue, githubInterfaceAPI, stats)
     val classFinders = listOf(
-            JavaClassProcessor(releaseQueue, Types, stats),
-            JavaClassProcessor(releaseQueue, Types, stats),
-            JavaClassProcessor(releaseQueue, Types, stats),
-            JavaClassProcessor(releaseQueue, Types, stats))
+            JavaClassProcessor(releaseQueue, stats),
+            JavaClassProcessor(releaseQueue, stats),
+            JavaClassProcessor(releaseQueue, stats),
+            JavaClassProcessor(releaseQueue, stats))
 
     val ti = Thread(reposDiscoverer)
     val tFinders = classFinders.map {

@@ -6,6 +6,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
 import com.github.javaparser.ast.type.ClassOrInterfaceType
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter
 import com.wiam.github.listreleases.Release
+import com.wiam.persistence.ClassFinderError
 import com.wiam.persistence.Types
 import com.wiam.stats.Statistics
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -81,7 +82,7 @@ class ReleaseArchive(private val identifier: String, stream: InputStream) {
     }
 }
 
-class JavaClassProcessor(private val processQueue: Producer<Release>, private val database: Types, private val stats: Statistics) : Runnable {
+class JavaClassProcessor(private val processQueue: Producer<Release>, private val stats: Statistics) : Runnable {
     override fun run() {
         do {
             val release = processQueue.get()
@@ -98,7 +99,7 @@ class JavaClassProcessor(private val processQueue: Producer<Release>, private va
                             val (type, lines) = it
                             lines.forEach { lineInFile ->
                                 stats.add("java.types.total", 1)
-                                database.insert(release.repository.url, type.type_name, release.htmlUrl(file.path), lineInFile)
+                                Types.insert(release.repository.url, type.type_name, release.htmlUrl(file.path), lineInFile)
                             }
                         }
                     }
@@ -106,7 +107,12 @@ class JavaClassProcessor(private val processQueue: Producer<Release>, private va
                 log.info("Processed ${release.url} and found ${files.size} files ($nbTypes types)")
             } catch (ioException: IOException) {
                 stats.add("java.process.error", 1)
-                log.severe("Error processing ${release.url}: ${ioException.message}")
+                log.severe("ClassFinderError processing ${release.url}: ${ioException.message}")
+                // TODO: should insert be transaction-safe? for all types?
+                transaction {
+                    ClassFinderError.insert(release.repository.name, release.repository.url, ioException.message
+                            ?: "no message")
+                }
             }
         } while (true)
     }
